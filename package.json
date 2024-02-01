@@ -1,0 +1,53 @@
+{
+	"name": "main-api",
+	"description": "API for CasinoVision",
+	"project": "CasinoVision",
+	"version": "0.0.4",
+	"main": "index.js",
+	"templ_api": "5i256cus2d",
+	"scripts": {
+		"compile_dev": "rm -rf dist_func/* && tsc",
+		"compile": "tsc -p tsconfig.prod.json",
+		"run_api_local": "./run-BE-local.bat",
+		"//----shrink----": "::: Scripts for shrinking node_modules ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::",
+		"shrink_verb": "ts-node shrinker.ts -v",
+		"shrink_": "rm -rf dist_layer && ts-node shrinker.ts && mv dist dist_layer && cd ./dist_layer && mkdir -p nodejs && mv node_modules nodejs",
+		"shrink": "rm -rf dist_layer && ts-node shrinker.ts && ./shrinker_ren.sh",
+		"shrink_modules": "ts-node shrinker.ts",
+		"shrink_rm": "rm -rf dist",
+		"//----dist----": "::: Scripts for create distributive ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::",
+		"dist": "npm run compile && npm run shrink",
+		"dist_new": "rm -rf dist && npm run compile && npm run shrink_verb",
+		"dist_externalize": "npm run compile && ts-node shrinker.ts -e && mv dist/node_modules ../$npm_package_name-$npm_package_version-dist && cp -R dist_func/* ../$npm_package_name-$npm_package_version-dist && rm -rf dist",
+		"clean_temp": "rm -rf dist_func && rm -rf dist_layer && rm -rf release && rm -rf export && rm -rf generated && rm -rf dist",
+		"//----packs----": "::: Scripts for packaging ZIPs for deploy ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::",
+		"pack_func": "mkdir -p release && cd ./dist_func && zip -r -q ../release/lambda_function.zip ./",
+		"pack": "mkdir -p release && cd ./dist && zip -r -q ../release/lambda_function.zip ./",
+		"pack_layer": "mkdir -p release && cd ./dist_layer && zip -r -q ../release/lambda_layer.zip nodejs",
+		"pack_all": "rm -rf release/*.zip && npm run pack_func && npm run pack_layer",
+		"pre_deploy": "npm run dist && npm run pack_all",
+		"//----packs partial----": "::: Scripts for packaging ZIPs for deploy ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::",
+		"compile_pack_func": "rm -rf release/lambda_function.zip && npm run compile && npm run pack_func",
+		"shrink_pack_layer": "rm -rf release/lambda_layer.zip && npm run shrink && npm run pack_layer",
+		"//-------------": "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"aws-lambda": "^1.0.7",
+		"aws-sdk": "^2.1548.0",
+		"http-status-codes": "^2.3.0",
+		"mongoose": "^7.5.3"
+	},
+	"devDependencies": {
+		"@types/aws-lambda": "^8.10.130",
+		"@types/fs-extra": "^11.0.4",
+		"@types/mongoose": "^5.11.97",
+		"@types/node": "^20.10.6",
+		"deepmerge": "^4.3.1",
+		"fs-extra": "^11.2.0",
+		"ts-node": "^10.9.2",
+		"typescript": "^5.3.3"
+	}
+}

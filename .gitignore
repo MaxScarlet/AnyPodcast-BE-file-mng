@@ -1,0 +1,16 @@
+dist
+dist_func
+dist_layer
+
+release
+export
+generated
+node_modules
+mock
+.DS_Store
+
+__tests__/**/coverage
+**/jest-report*.xml
+/junit.xml
+
+

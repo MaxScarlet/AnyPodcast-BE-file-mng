@@ -1,0 +1,38 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "pwa-node",
+      "request": "launch",
+      "name": "Launch JS Dist",
+      "skipFiles": ["<node_internals>/**"],
+      "program": "${workspaceFolder}/dist/src/index.js"
+    },
+    {
+      "name": "Launch JS File ",
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "type": "pwa-node",
+      "program": "${file}"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch TS File",
+      "program": "${file}",
+      "preLaunchTask": "npm: compile_dev",
+      "outFiles": ["${workspaceFolder}/dist_func/**/*.js"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "TS local",
+      "program": "${workspaceFolder}/src/index.ts",
+      "preLaunchTask": "npm: compile",
+      "outFiles": ["${workspaceFolder}/dist_func/**/*.js"]
+    }
+  ]
+}
