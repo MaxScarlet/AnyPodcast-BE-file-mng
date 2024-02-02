@@ -6,6 +6,7 @@ import { StatRecordDoc, StatRecordSchema } from "./models/StatRecord";
 import { GenericApiController } from "./controllers/genericApiController";
 import { PartsMngController } from "./controllers/partsmngController";
 import { PartsMngService } from "./services/partsmngService";
+import AWS from "aws-sdk";
 
 const tableName = process.env.DB_TABLE!;
 
@@ -16,9 +17,11 @@ const fileMngController = new FileMngController(fileMngService);
 
 const partsMngService = new PartsMngService(dbHelper);
 const partsMngController = new PartsMngController(partsMngService);
+
 export const handler = async (event: APIGatewayProxyEvent) => {
 	console.log(`Event: ${JSON.stringify(event)}`);
 	await dbHelper.connect();
+
 
 	const resourceName = GenericApiController.getRootResource(event.resource, 1);
 	switch (resourceName) {

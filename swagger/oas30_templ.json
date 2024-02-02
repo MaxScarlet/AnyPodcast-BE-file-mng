@@ -1,253 +1,20 @@
 {
   "openapi" : "3.0.1",
   "info" : {
-    "title" : "CasinoVision - tmpl",
-    "description" : "CasinoVision - template",
-    "version" : "2024-01-15T16:33:39Z"
+    "title" : "FileMng",
+    "version" : "2024-02-01T12:28:44Z"
   },
   "servers" : [ {
-    "url" : "https://5i256cus2d.execute-api.${region}.amazonaws.com/{basePath}",
+    "url" : "https://9q4yvdedcj.execute-api.il-central-1.amazonaws.com/{basePath}",
     "variables" : {
       "basePath" : {
-        "default" : "templ"
+        "default" : "stg"
       }
     }
   } ],
   "paths" : {
-    "/analytics" : {
-      "post" : {
-        "operationId" : "Turn",
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/Turn"
-              }
-            }
-          },
-          "required" : true
-        },
-        "responses" : {
-          "200" : {
-            "description" : "200 response",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/PredictionList"
-                }
-              }
-            }
-          }
-        },
-        "x-amazon-apigateway-integration" : {
-          "type" : "aws_proxy",
-          "httpMethod" : "POST",
-          "uri" : "arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${region}:${account}:function:${lambda_name}/invocations",
-          "responses" : {
-            "default" : {
-              "statusCode" : "200"
-            }
-          },
-          "passthroughBehavior" : "when_no_match",
-          "contentHandling" : "CONVERT_TO_TEXT"
-        }
-      },
-      "options" : {
-        "responses" : {
-          "200" : {
-            "description" : "200 response",
-            "headers" : {
-              "Access-Control-Allow-Origin" : {
-                "schema" : {
-                  "type" : "string"
-                }
-              },
-              "Access-Control-Allow-Methods" : {
-                "schema" : {
-                  "type" : "string"
-                }
-              },
-              "Access-Control-Allow-Headers" : {
-                "schema" : {
-                  "type" : "string"
-                }
-              }
-            },
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Empty"
-                }
-              }
-            }
-          }
-        },
-        "x-amazon-apigateway-integration" : {
-          "type" : "mock",
-          "responses" : {
-            "default" : {
-              "statusCode" : "200",
-              "responseParameters" : {
-                "method.response.header.Access-Control-Allow-Methods" : "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'",
-                "method.response.header.Access-Control-Allow-Headers" : "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
-                "method.response.header.Access-Control-Allow-Origin" : "'*'"
-              }
-            }
-          },
-          "requestTemplates" : {
-            "application/json" : "{\"statusCode\": 200}"
-          },
-          "passthroughBehavior" : "when_no_match"
-        }
-      }
-    },
-    "/search" : {
-      "post" : {
-        "operationId" : "Search",
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/SearchParams"
-              }
-            }
-          },
-          "required" : true
-        },
-        "responses" : {
-          "200" : {
-            "description" : "200 response",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Empty"
-                }
-              }
-            }
-          }
-        },
-        "x-amazon-apigateway-integration" : {
-          "type" : "aws_proxy",
-          "httpMethod" : "POST",
-          "uri" : "arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${region}:${account}:function:${lambda_name}/invocations",
-          "responses" : {
-            "default" : {
-              "statusCode" : "200"
-            }
-          },
-          "passthroughBehavior" : "when_no_match",
-          "contentHandling" : "CONVERT_TO_TEXT"
-        }
-      },
-      "options" : {
-        "responses" : {
-          "200" : {
-            "description" : "200 response",
-            "headers" : {
-              "Access-Control-Allow-Origin" : {
-                "schema" : {
-                  "type" : "string"
-                }
-              },
-              "Access-Control-Allow-Methods" : {
-                "schema" : {
-                  "type" : "string"
-                }
-              },
-              "Access-Control-Allow-Headers" : {
-                "schema" : {
-                  "type" : "string"
-                }
-              }
-            },
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Empty"
-                }
-              }
-            }
-          }
-        },
-        "x-amazon-apigateway-integration" : {
-          "type" : "mock",
-          "responses" : {
-            "default" : {
-              "statusCode" : "200",
-              "responseParameters" : {
-                "method.response.header.Access-Control-Allow-Methods" : "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'",
-                "method.response.header.Access-Control-Allow-Headers" : "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
-                "method.response.header.Access-Control-Allow-Origin" : "'*'"
-              }
-            }
-          },
-          "requestTemplates" : {
-            "application/json" : "{\"statusCode\": 200}"
-          },
-          "passthroughBehavior" : "when_no_match"
-        }
-      }
-    },
-    "/stats" : {
+    "/init" : {
       "get" : {
-        "operationId" : "StatsGet",
-        "parameters" : [ {
-          "name" : "Date",
-          "in" : "query",
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "CasinoName",
-          "in" : "query",
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "DealerName",
-          "in" : "query",
-          "required" : true,
-          "schema" : {
-            "type" : "string"
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "200 response",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/StatRecordList"
-                }
-              }
-            }
-          }
-        },
-        "x-amazon-apigateway-integration" : {
-          "type" : "aws_proxy",
-          "httpMethod" : "POST",
-          "uri" : "arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${region}:${account}:function:${lambda_name}/invocations",
-          "responses" : {
-            "default" : {
-              "statusCode" : "200"
-            }
-          },
-          "passthroughBehavior" : "when_no_match",
-          "contentHandling" : "CONVERT_TO_TEXT"
-        }
-      },
-      "post" : {
-        "operationId" : "StatAdd",
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/StatRecord"
-              }
-            }
-          },
-          "required" : true
-        },
         "responses" : {
           "200" : {
             "description" : "200 response",
@@ -263,7 +30,159 @@
         "x-amazon-apigateway-integration" : {
           "type" : "aws_proxy",
           "httpMethod" : "POST",
-          "uri" : "arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${region}:${account}:function:${lambda_name}/invocations",
+          "uri" : "arn:aws:apigateway:il-central-1:lambda:path/2015-03-31/functions/arn:aws:lambda:il-central-1:089286297150:function:fileMng-init/invocations",
+          "responses" : {
+            "default" : {
+              "statusCode" : "200"
+            }
+          },
+          "passthroughBehavior" : "when_no_match",
+          "contentHandling" : "CONVERT_TO_TEXT"
+        }
+      },
+      "options" : {
+        "responses" : {
+          "200" : {
+            "description" : "200 response",
+            "headers" : {
+              "Access-Control-Allow-Origin" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              },
+              "Access-Control-Allow-Methods" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              },
+              "Access-Control-Allow-Headers" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Empty"
+                }
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration" : {
+          "type" : "mock",
+          "responses" : {
+            "default" : {
+              "statusCode" : "200",
+              "responseParameters" : {
+                "method.response.header.Access-Control-Allow-Methods" : "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'",
+                "method.response.header.Access-Control-Allow-Headers" : "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+                "method.response.header.Access-Control-Allow-Origin" : "'*'"
+              }
+            }
+          },
+          "requestTemplates" : {
+            "application/json" : "{\"statusCode\": 200}"
+          },
+          "passthroughBehavior" : "when_no_match"
+        }
+      }
+    },
+    "/upload" : {
+      "post" : {
+        "responses" : {
+          "200" : {
+            "description" : "200 response",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Empty"
+                }
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration" : {
+          "type" : "aws_proxy",
+          "httpMethod" : "POST",
+          "uri" : "arn:aws:apigateway:il-central-1:lambda:path/2015-03-31/functions/arn:aws:lambda:il-central-1:089286297150:function:fileMng/invocations",
+          "responses" : {
+            "default" : {
+              "statusCode" : "200"
+            }
+          },
+          "passthroughBehavior" : "when_no_match",
+          "contentHandling" : "CONVERT_TO_TEXT"
+        }
+      },
+      "options" : {
+        "responses" : {
+          "200" : {
+            "description" : "200 response",
+            "headers" : {
+              "Access-Control-Allow-Origin" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              },
+              "Access-Control-Allow-Methods" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              },
+              "Access-Control-Allow-Headers" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Empty"
+                }
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration" : {
+          "type" : "mock",
+          "responses" : {
+            "default" : {
+              "statusCode" : "200",
+              "responseParameters" : {
+                "method.response.header.Access-Control-Allow-Methods" : "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'",
+                "method.response.header.Access-Control-Allow-Headers" : "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+                "method.response.header.Access-Control-Allow-Origin" : "'*'"
+              }
+            }
+          },
+          "requestTemplates" : {
+            "application/json" : "{\"statusCode\": 200}"
+          },
+          "passthroughBehavior" : "when_no_match"
+        }
+      }
+    },
+    "/complete" : {
+      "post" : {
+        "responses" : {
+          "200" : {
+            "description" : "200 response",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Empty"
+                }
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration" : {
+          "type" : "aws_proxy",
+          "httpMethod" : "POST",
+          "uri" : "arn:aws:apigateway:il-central-1:lambda:path/2015-03-31/functions/arn:aws:lambda:il-central-1:089286297150:function:fileMng-complete/invocations",
           "responses" : {
             "default" : {
               "statusCode" : "200"
@@ -325,121 +244,11 @@
   },
   "components" : {
     "schemas" : {
-      "PredictionList" : {
-        "title" : "PredictionList",
-        "type" : "array",
-        "items" : {
-          "$ref" : "#/components/schemas/Prediction"
-        }
-      },
-      "StatRecordList" : {
-        "title" : "StatRecordList",
-        "type" : "array",
-        "items" : {
-          "$ref" : "#/components/schemas/StatRecord"
-        }
-      },
       "Empty" : {
         "title" : "Empty Schema",
         "type" : "object"
-      },
-      "SearchParams" : {
-        "title" : "SearchParams",
-        "required" : [ "CasinoName", "DealerName" ],
-        "type" : "object",
-        "properties" : {
-          "DealerName" : {
-            "type" : "string",
-            "default" : ""
-          },
-          "CasinoName" : {
-            "type" : "string",
-            "default" : ""
-          },
-          "Rotation" : {
-            "type" : "boolean"
-          },
-          "SearchValue" : {
-            "type" : "string"
-          }
-        }
-      },
-      "Prediction" : {
-        "title" : "Prediction",
-        "required" : [ "color", "number", "quantity" ],
-        "type" : "object",
-        "properties" : {
-          "number" : {
-            "type" : "string",
-            "default" : ""
-          },
-          "color" : {
-            "type" : "string",
-            "default" : ""
-          },
-          "quantity" : {
-            "type" : "number",
-            "default" : 0
-          }
-        }
-      },
-      "StatRecord" : {
-        "title" : "StatRecord",
-        "required" : [ "CasinoName", "Created", "DealerName", "Diff", "EndPos", "Rotation", "StartPos" ],
-        "type" : "object",
-        "properties" : {
-          "Created" : {
-            "type" : "string",
-            "default" : ""
-          },
-          "DealerName" : {
-            "type" : "string",
-            "default" : ""
-          },
-          "CasinoName" : {
-            "type" : "string",
-            "default" : ""
-          },
-          "Rotation" : {
-            "type" : "boolean",
-            "default" : false
-          },
-          "StartPos" : {
-            "type" : "string",
-            "default" : "0"
-          },
-          "EndPos" : {
-            "type" : "string",
-            "default" : ""
-          },
-          "Diff" : {
-            "type" : "number",
-            "default" : -1
-          }
-        }
-      },
-      "Turn" : {
-        "title" : "Turn",
-        "required" : [ "CasinoName", "DealerName", "Rotation", "StartPos" ],
-        "type" : "object",
-        "properties" : {
-          "DealerName" : {
-            "type" : "string"
-          },
-          "CasinoName" : {
-            "type" : "string"
-          },
-          "Rotation" : {
-            "type" : "boolean"
-          },
-          "StartPos" : {
-            "type" : "string"
-          },
-          "EndPos" : {
-            "type" : "string"
-          }
-        }
       }
     }
-  }
+  },
+  "x-amazon-apigateway-binary-media-types" : [ "multipart/form-data" ]
 }

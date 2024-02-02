@@ -1,10 +1,16 @@
 import { IFileMngService } from "../controllers/filemngController";
 import { IDbHelper } from "../helpers/IDbHelper";
-import { S3 } from "aws-sdk";
+import {
+	S3Client,
+	CreateMultipartUploadCommand,
+	UploadPartCommand,
+	CompleteMultipartUploadCommand,
+	CompleteMultipartUploadCommandInput,
+} from "@aws-sdk/client-s3";
+const s3 = new S3Client({ region: "eu-west-1" });
 
 import { StatRecord, StatRecordDoc } from "../models/StatRecord";
 // import { SearchParams } from "../models/searchParams";
-const s3 = new S3({ region: "eu-west-1" });
 export class FileMngService implements IFileMngService<StatRecord> {
 	constructor(private dbHelper: IDbHelper<StatRecordDoc> | IDbHelper<StatRecord>) {}
 
@@ -15,10 +21,13 @@ export class FileMngService implements IFileMngService<StatRecord> {
 			const bucket = "upload.eu-w1.oxymoron-technique.com";
 			const key = `upload/${fileName}`;
 
-			const initiateUploadResponse = await s3
-				.createMultipartUpload({ Bucket: bucket, Key: key })
-				.promise();
-			const uploadId = initiateUploadResponse.UploadId;
+			const createMultipartUploadResponse = await s3.send(
+				new CreateMultipartUploadCommand({
+					Bucket: bucket,
+					Key: key,
+				})
+			);
+			const uploadId = createMultipartUploadResponse.UploadId;
 
 			return uploadId!;
 		} catch (error: any) {
@@ -31,17 +40,14 @@ export class FileMngService implements IFileMngService<StatRecord> {
 		const bucket = `upload.eu-w1.oxymoron-technique.com`;
 		const key = `upload/${fileName}`;
 
-		const multipartResponse = await s3
-			.completeMultipartUpload({
-				Bucket: bucket,
-				Key: key,
-				UploadId: uploadId,
-				MultipartUpload: { Parts: completedParts },
-			})
-			.promise();
-            
-		console.log("multipartResponse", multipartResponse);
-
-		return multipartResponse;
+		const completeMultipartUploadInput: CompleteMultipartUploadCommandInput = {
+			Bucket: bucket,
+			Key: key,
+			UploadId: uploadId,
+			MultipartUpload: {
+				Parts: completedParts,
+			},
+		};
+		await s3.send(new CompleteMultipartUploadCommand(completeMultipartUploadInput));
 	}
 }

@@ -14,9 +14,9 @@ export class PartsMngController extends GenericApiController {
 			switch (httpMethod) {
 				case "POST":
 					const queryString = event.queryStringParameters;
-					const itemPost: any = JSON.parse(body!);
-					await this.service.upload(queryString, itemPost);
-					return this.successResponse({ resp: null }, StatusCodes.CREATED);
+					const part: string = body!;
+					const resp = await this.service.upload(queryString, part);
+					return this.successResponse({ resp: resp }, StatusCodes.CREATED);
 				default:
 					return this.errorResponse(StatusCodes.METHOD_NOT_ALLOWED);
 			}
@@ -28,5 +28,5 @@ export class PartsMngController extends GenericApiController {
 }
 
 export interface IPartsMngService<T> {
-	upload(queryString: any, body: any): Promise<string>;
+	upload(queryString: any, body: string): Promise<any>;
 }
