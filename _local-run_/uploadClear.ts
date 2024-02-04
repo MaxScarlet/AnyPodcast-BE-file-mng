@@ -1,29 +1,24 @@
 import * as AWS from "aws-sdk";
+import { UploaderConfig } from "../src/services/uploaderSettings";
 
 async function clearMultipartUploads() {
-	// Specify your S3 bucket name
-	const BUCKET_NAME = "upload.eu-w1.oxymoron-technique.com";
-
-	// Create an S3 instance
-	const s3 = new AWS.S3({ region: "eu-west-1" });
+	const bucket = UploaderConfig.Bucket;
+	const s3 = new AWS.S3({ region: UploaderConfig.BucketRegion });
 
 	try {
-		// List multipart uploads
-		const listResult = await s3.listMultipartUploads({ Bucket: BUCKET_NAME }).promise();
+		const listResult = await s3.listMultipartUploads({ Bucket: bucket }).promise();
 
 		// Iterate through the results
 		for (const upload of listResult.Uploads || []) {
 			const key = upload.Key;
 			const uploadId = upload.UploadId;
 
-			// Print the Key and UploadId for each iteration
 			console.log(`Key: ${key}, UploadId: ${uploadId}`);
 			const params: AWS.S3.AbortMultipartUploadRequest = {
-				Bucket: BUCKET_NAME,
+				Bucket: bucket,
 				Key: key!,
 				UploadId: uploadId!,
 			};
-			// Abort the multipart upload
 			await s3.abortMultipartUpload(params).promise();
 		}
 
@@ -33,5 +28,4 @@ async function clearMultipartUploads() {
 	}
 }
 
-// Run the function
 clearMultipartUploads();

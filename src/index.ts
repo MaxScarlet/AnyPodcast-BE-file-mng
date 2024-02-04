@@ -6,7 +6,6 @@ import { StatRecordDoc, StatRecordSchema } from "./models/StatRecord";
 import { GenericApiController } from "./controllers/genericApiController";
 import { PartsMngController } from "./controllers/partsmngController";
 import { PartsMngService } from "./services/partsmngService";
-import AWS from "aws-sdk";
 
 const tableName = process.env.DB_TABLE!;
 
@@ -19,18 +18,20 @@ const partsMngService = new PartsMngService(dbHelper);
 const partsMngController = new PartsMngController(partsMngService);
 
 export const handler = async (event: APIGatewayProxyEvent) => {
-	console.log(`Event: ${JSON.stringify(event)}`);
 	await dbHelper.connect();
-
 
 	const resourceName = GenericApiController.getRootResource(event.resource, 1);
 	switch (resourceName) {
 		case "init":
 		case "complete":
-			console.log("init/complete");
+			console.log(`Event: ${JSON.stringify(event)}`);
+			console.log("init or complete API");
 			return await fileMngController.handleRequest(event);
 		case "upload":
-			console.log("upload");
+			console.log("upload API");
+			return await partsMngController.handleRequest(event);
+		case "test":
+			console.log("test API");
 			return await partsMngController.handleRequest(event);
 		default:
 			throw new Error("Invalid resource");
