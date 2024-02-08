@@ -99,6 +99,16 @@ const changeRef = (request: string, realPath: string): void => {
 	fs.writeFileSync(distPath + target, code);
 };
 
+const isPackInArray = (arr: string[], packName: string) => {
+	return arr.some(nameDef => {
+        if (nameDef.endsWith('/*')) { // If the pattern ends with '/*', we remove this part and check if the packName starts with the remaining string
+            return packName.startsWith(nameDef.slice(0, -2));
+        } else { // Exact match
+            return packName === nameDef;
+        }
+    });
+}
+
 const results: {
 	total: number;
 	shrinked: number;
@@ -113,59 +123,12 @@ let asIs: string[] = [
 	"mongoose",
 	"mongodb-connection-string-url",
 	"argparse",
-	"@smithy/abort-controller",
-	"@smithy/chunked-blob-reader",
-	"@smithy/chunked-blob-reader-native",
-	"@smithy/config-resolver",
-	"@smithy/core",
-	"@smithy/credential-provider-imds",
-	"@smithy/eventstream-codec",
-	"@smithy/eventstream-serde-browser",
-	"@smithy/eventstream-serde-config-resolver",
-	"@smithy/eventstream-serde-node",
-	"@smithy/eventstream-serde-universal",
-	"@smithy/fetch-http-handler",
-	"@smithy/hash-blob-browser",
-	"@smithy/hash-node",
-	"@smithy/hash-stream-node",
-	"@smithy/invalid-dependency",
-	"@smithy/is-array-buffer",
-	"@smithy/md5-js",
-	"@smithy/middleware-content-length",
-	"@smithy/middleware-endpoint",
-	"@smithy/middleware-retry",
-	"@smithy/middleware-serde",
-	"@smithy/middleware-stack",
-	"@smithy/node-config-provider",
-	"@smithy/node-http-handler",
-	"@smithy/property-provider",
-	"@smithy/protocol-http",
-	"@smithy/querystring-builder",
-	"@smithy/querystring-parser",
-	"@smithy/service-error-classification",
-	"@smithy/shared-ini-file-loader",
-	"@smithy/signature-v4",
-	"@smithy/smithy-client",
-	"@smithy/types",
-	"@smithy/url-parser",
-	"@smithy/util-base64",
-	"@smithy/util-body-length-browser",
-	"@smithy/util-body-length-node",
-	"@smithy/util-buffer-from",
-	"@smithy/util-config-provider",
-	"@smithy/util-defaults-mode-browser",
-	"@smithy/util-defaults-mode-node",
-	"@smithy/util-endpoints",
-	"@smithy/util-hex-encoding",
-	"@smithy/util-middleware",
-	"@smithy/util-retry",
-	"@smithy/util-stream",
-	"@smithy/util-uri-escape",
-	"@smithy/util-utf8",
-	"@smithy/util-waiter",
+	"@smithy/*",
+	"@aws-crypto/*",
+	"@aws-sdk/*"
 ]; // , '@tootallnate/once', 'i18n', 'messageformat', 'agent-base', 'tsutils', "superagent", 'argparse'
 
-const extractFromDist: string[] = []; // '@tootallnate/once'
+const extractFromDist: string[] = [];
 
 // If we need to externalize the project to test the compiled package locally,
 // we can't ignore packs of AWS Lambda container.
@@ -202,10 +165,11 @@ packKeys.forEach((packNameFull: string) => {
 		if (d.dev) {
 			if (options.verbose) console.log(`${packName} ...dev package, skipped.`);
 			results.skipped++;
-		} else if (ignore.includes(packName)) {
+		} else if (isPackInArray(ignore, packName)) {
 			if (options.verbose) console.log(`${packName} ...ignored, skipped.`);
 			results.ignored++;
-		} else if (asIs.includes(packName)) {
+		// } else if (asIs.includes(packName)) {
+		} else if (isPackInArray(asIs, packName)) {
 			const pathFrom = path.join(initialFolder, packName);
 			pathTo = path.join(distrFolder, "node_modules", packName);
 			fse.copySync(pathFrom, pathTo, { overwrite: true });

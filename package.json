@@ -2,9 +2,10 @@
 	"name": "file-mng",
 	"description": "API AWS S3 multipart upload",
 	"project": "AnyPodcast",
-	"version": "0.0.2",
+	"version": "0.0.3",
+	"main_entity": "Upload",
 	"main": "index.js",
-	"templ_api": "9q4yvdedcj",
+	"templ_api": "o9qfvgrga3",
 	"scripts": {
 		"compile_dev": "rm -rf dist_func/* && tsc",
 		"compile": "rm -rf dist_func/* && tsc -p tsconfig.prod.json",
@@ -13,7 +14,7 @@
 		"shrink_verb": "ts-node shrinker.ts -v",
 		"shrink_": "rm -rf dist_layer && ts-node shrinker.ts && mv dist dist_layer && cd ./dist_layer && mkdir -p nodejs && mv node_modules nodejs",
 		"shrink": "rm -rf dist_layer && ts-node shrinker.ts && ./shrinker_ren.sh",
-		"shrink_modules": "ts-node modulesPack.ts && ./shrinker_ren.sh ",
+		"shrink_modules": "ts-node modulesPack.ts && ./shrinker_ren.sh",
 		"shrink_rm": "rm -rf dist",
 		"//----dist----": "::: Scripts for create distributive ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::",
 		"dist": "npm run compile && npm run shrink",
@@ -37,6 +38,7 @@
 	"license": "ISC",
 	"dependencies": {
 		"@aws-sdk/client-s3": "^3.504.0",
+		"@aws-sdk/s3-request-presigner": "^3.504.0",
 		"aws-lambda": "^1.0.7",
 		"http-status-codes": "^2.3.0",
 		"mongoose": "^7.5.3"

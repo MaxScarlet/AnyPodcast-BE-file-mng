@@ -176,7 +176,7 @@ class MongoConfig {
   constructor(private clusterName: string) { }
   public user = "dbOwner";
   public pass = "WQdmUA82JK2qO5Vq";
-  public dbName = "CasinoVision";
+  public dbName = process.env.DB_NAME;
 
   public get connectionString(): string {
     return `mongodb+srv://${this.user}:${this.pass}@${this.clusterName}/?retryWrites=true&w=majority`;

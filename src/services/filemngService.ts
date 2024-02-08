@@ -1,48 +1,126 @@
-import { IFileMngService } from "../controllers/filemngController";
+
 import { IDbHelper } from "../helpers/IDbHelper";
 import {
 	S3Client,
 	CreateMultipartUploadCommand,
 	CompleteMultipartUploadCommand,
 	CompleteMultipartUploadCommandInput,
+	UploadPartCommand,
+	GetObjectCommand,
 } from "@aws-sdk/client-s3";
-
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { UploaderConfig } from "./uploaderSettings";
-import { StatRecord, StatRecordDoc } from "../models/StatRecord";
+import { Upload, UploadDoc } from "../models/Upload";
+import { once } from 'events';
+import { Readable } from "stream";
+import { Part } from "../models/Part";
 
-const s3 = new S3Client({ region: UploaderConfig.BucketRegion });
-export class FileMngService implements IFileMngService<StatRecord> {
-	constructor(private dbHelper: IDbHelper<StatRecordDoc> | IDbHelper<StatRecord>) { }
+export interface IFileMngService<T> {
+	init(upload: Upload): Promise<Upload>;
+	// uploadPart(part: Part, body: string): Promise<Part>;
+	downloadFile(fileName: string): Promise<Buffer>;
+	complete(upload: Upload, completedParts: any): Promise<any>;
+}
 
-	async init(queryString: any): Promise<string> {
-		console.log("QS", queryString);
-		const { fileName } = queryString;
-		const key = `${UploaderConfig.UploadFolder}/${fileName}`;
+export class FileMngService implements IFileMngService<Upload> {
+	private s3 = new S3Client({ region: UploaderConfig.BucketRegion });
+	constructor(private dbHelper: IDbHelper<UploadDoc> | IDbHelper<Upload>) { }
 
-		const createMultipartUploadResponse = await s3.send(
-			new CreateMultipartUploadCommand({
+	async init(upload: Upload): Promise<Upload> {
+		console.log("Upload", upload);
+	
+		const createResp = await this.s3.send(new CreateMultipartUploadCommand({
+			Bucket: UploaderConfig.Bucket,
+			Key: UploaderConfig.GetKey(upload.FileName),
+		}));
+		upload.UploadId = createResp.UploadId!;
+	
+		// Assuming totalParts is passed in with the upload or calculated based on file size
+		const totalParts = upload.TotalParts?? 0; 
+		const expTime = process.env.ENV === "local"? 60 : 3600; // URL expires in 1 hour
+		for (let partNumber = 1; partNumber <= totalParts; partNumber++) {
+			const command = new UploadPartCommand({
 				Bucket: UploaderConfig.Bucket,
-				Key: key,
-			})
-		);
-		const uploadId = createMultipartUploadResponse.UploadId;
+				Key: UploaderConfig.GetKey(upload.FileName),
+				UploadId: upload.UploadId,
+				PartNumber: partNumber,
+			});
+			const url = await getSignedUrl(this.s3, command, { expiresIn: expTime }); 
+			upload.Parts.push({ PartNumber: partNumber, PresignedUrl: url });
+		}
+	
+		// Create record in DB with pre-signed URLs
+		upload.Created = new Date().toISOString();
+		upload.IsCompleted = false;
+		await this.dbHelper.create<Upload>(upload);
+	
+		return upload;
+	}
+	
+	// async uploadPart(part: Part, body: string): Promise<Part> {
+	// 	const uploadFound = await this.dbHelper.get_list<Upload>({ UploadId: part.UploadId });
+	// 	console.log("uploadFound in DB", uploadFound);
+	// 	if (uploadFound) {
+	// 		const upload = uploadFound[0];
+	// 		const filePart = Buffer.from(body, "base64");
 
-		return uploadId!;
+	// 		const uploadPartResponse = await this.s3.send(
+	// 			new UploadPartCommand({
+	// 				Bucket: UploaderConfig.Bucket,
+	// 				Key: UploaderConfig.GetKey(upload.FileName),
+	// 				PartNumber: part.PartNumber,
+	// 				UploadId: part.UploadId,
+	// 				Body: filePart,
+	// 			})
+	// 		);
+	// 		part.ETag = uploadPartResponse.ETag;
+	// 		const { UploadId, ...partOut } = part;
+	// 		return partOut;
+	// 	} else {
+	// 		throw new Error(`Upload ${part.UploadId} not found`);
+	// 	}
+	// }
+
+	async complete(upload: Upload, completedParts: Part[]): Promise<any> {
+		const uploadFound = await this.dbHelper.get_list<UploadDoc>({ UploadId: upload.UploadId });
+		console.log("uploadFound in DB", uploadFound);
+		if (uploadFound) {
+			const upload = uploadFound[0];
+			completedParts.sort((a, b) => a.PartNumber - b.PartNumber);
+			console.log("completedParts", completedParts);
+			
+			const completeMultipartUploadInput: CompleteMultipartUploadCommandInput = {
+				Bucket: UploaderConfig.Bucket,
+				Key: UploaderConfig.GetKey(upload.FileName),
+				UploadId: upload.UploadId,
+				MultipartUpload: {
+					Parts: completedParts,
+				},
+			};
+			const resp = await this.s3.send(new CompleteMultipartUploadCommand(completeMultipartUploadInput));
+			upload.IsCompleted = true;
+			const response = await this.dbHelper.update<Upload>(upload._id, upload);
+			return upload;
+		} else {
+			throw new Error(`Upload ${upload.UploadId} not found`);
+		}
 	}
 
-	async complete(queryString: any, completedParts: any): Promise<any> {
-		const { fileName, uploadId } = queryString;
-		const key = `${UploaderConfig.UploadFolder}/${fileName}`;
-
-		const completeMultipartUploadInput: CompleteMultipartUploadCommandInput = {
+	async downloadFile(fileName: string): Promise<Buffer> {
+		console.log("Upload", fileName);
+		const getObjectParams = {
 			Bucket: UploaderConfig.Bucket,
-			Key: key,
-			UploadId: uploadId,
-			MultipartUpload: {
-				Parts: completedParts,
-			},
+			Key: `${UploaderConfig.UploadFolder}/${fileName}`,
 		};
-		const resp = await s3.send(new CompleteMultipartUploadCommand(completeMultipartUploadInput));
-		return resp;
+
+		const { Body } = await this.s3.send(new GetObjectCommand(getObjectParams));
+		if (Body instanceof Readable) {
+			const chunks: any[] = [];
+			Body.on('data', (chunk) => chunks.push(chunk));
+			await once(Body, 'end');
+			return Buffer.concat(chunks);
+		} else {
+			throw new Error("Expected a stream for the file body.");
+		}
 	}
 }

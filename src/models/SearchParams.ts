@@ -1,8 +1,6 @@
 export class SearchParams {
-  DealerName: string = "";
-  CasinoName: string = "";
-  Rotation?: boolean;
-  SearchValue?: string;
+  UploadId?: string;
+  FileName?: string;
 
   constructor(data?: SearchParams | string) {
     if (data) {

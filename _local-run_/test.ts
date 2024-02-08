@@ -1,5 +1,3 @@
-// require("./aws_config");
-
 import { APIGatewayProxyEvent } from "aws-lambda";
 import merge from "deepmerge";
 import { handler } from "../src/index";

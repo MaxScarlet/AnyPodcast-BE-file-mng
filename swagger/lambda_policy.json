@@ -1,1 +1,13 @@
-[]
+[
+    {
+        "Sid": "S3Policy",
+        "Action": [
+            "s3:PutObject",
+            "s3:ListBucketMultipartUploads",
+            "s3:ListBucket",
+            "s3:ListMultipartUploadParts"
+        ],
+        "Resource": "*",
+        "Effect": "Allow"
+    }
+  ]

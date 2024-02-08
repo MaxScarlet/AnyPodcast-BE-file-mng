@@ -1,38 +1,40 @@
 import { APIGatewayProxyEvent } from "aws-lambda";
-import { FileMngService } from "./services/filemngService";
-import { FileMngController } from "./controllers/filemngController";
 import MongoDbHelper from "./helpers/mongoHelper";
-import { StatRecordDoc, StatRecordSchema } from "./models/StatRecord";
 import { GenericApiController } from "./controllers/genericApiController";
-import { PartsMngController } from "./controllers/partsmngController";
-import { PartsMngService } from "./services/partsmngService";
+
+import { UploadDoc, UploadSchema } from "./models/Upload";
+import { InitController } from "./controllers/initController";
+import { CompleteController } from "./controllers/completeController";
+
+import { FileMngService } from "./services/filemngService";
 
 const tableName = process.env.DB_TABLE!;
 
-const dbHelper = new MongoDbHelper<StatRecordDoc>("StatRecord", StatRecordSchema, tableName);
-// const statsService = new FileMngService(dbHelper);
+const dbHelper = new MongoDbHelper<UploadDoc>("Upload", UploadSchema, tableName);
 const fileMngService = new FileMngService(dbHelper);
-const fileMngController = new FileMngController(fileMngService);
 
-const partsMngService = new PartsMngService(dbHelper);
-const partsMngController = new PartsMngController(partsMngService);
+const initController = new InitController(fileMngService);
+const completeController = new CompleteController(fileMngService);
 
 export const handler = async (event: APIGatewayProxyEvent) => {
 	await dbHelper.connect();
 
-	const resourceName = GenericApiController.getRootResource(event.resource, 1);
+	const resourceName = GenericApiController.getRootResource(event.resource, 2);
 	switch (resourceName) {
 		case "init":
+			console.log(`Event: ${JSON.stringify(event)}`);
+			console.log("init API");
+			return await initController.handleRequest(event);
+		// case "part":
+		// 	console.log("upload API");
+		// 	return await partsMngController.handleRequest(event);
 		case "complete":
 			console.log(`Event: ${JSON.stringify(event)}`);
-			console.log("init or complete API");
-			return await fileMngController.handleRequest(event);
-		case "upload":
-			console.log("upload API");
-			return await partsMngController.handleRequest(event);
-		case "test":
-			console.log("test API");
-			return await partsMngController.handleRequest(event);
+			console.log("complete API");
+			return await completeController.handleRequest(event);
+		// case "test":
+		// 	console.log("test API");
+		// 	return await partsMngController.handleRequest(event);
 		default:
 			throw new Error("Invalid resource");
 	}

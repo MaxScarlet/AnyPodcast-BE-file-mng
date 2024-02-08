@@ -1,29 +1,31 @@
 {
   "openapi" : "3.0.1",
   "info" : {
-    "title" : "FileMng",
-    "version" : "2024-02-02T20:57:04Z"
+    "title" : "AnyPodcast-FileMng_templ",
+    "version" : "2024-02-05T18:47:27Z"
   },
   "servers" : [ {
-    "url" : "https://9q4yvdedcj.execute-api.il-central-1.amazonaws.com/{basePath}",
+    "url" : "https://o9qfvgrga3.execute-api.${region}.amazonaws.com/{basePath}",
     "variables" : {
       "basePath" : {
-        "default" : "stg"
+        "default" : "templ"
       }
     }
   } ],
   "paths" : {
-    "/init" : {
-      "get" : {
+    "/upload/init" : {
+      "post" : {
         "operationId" : "init",
-        "parameters" : [ {
-          "name" : "fileName",
-          "in" : "query",
-          "required" : true,
-          "schema" : {
-            "type" : "string"
-          }
-        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Upload"
+              }
+            }
+          },
+          "required" : true
+        },
         "responses" : {
           "200" : {
             "description" : "200 response",
@@ -36,10 +38,9 @@
             }
           }
         },
-        "x-amazon-apigateway-request-validator" : "Validate query string parameters and headers",
         "x-amazon-apigateway-integration" : {
           "httpMethod" : "POST",
-          "uri" : "arn:aws:apigateway:il-central-1:lambda:path/2015-03-31/functions/arn:aws:lambda:il-central-1:089286297150:function:fileMng-init/invocations",
+          "uri" : "arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${region}:${account}:function:${lambda_name}/invocations",
           "responses" : {
             "default" : {
               "statusCode" : "200"
@@ -100,35 +101,13 @@
       }
     },
     "/upload" : {
-      "post" : {
-        "operationId" : "uploadPart",
-        "parameters" : [ {
-          "name" : "fileName",
-          "in" : "query",
-          "required" : true,
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "uploadId",
-          "in" : "query",
-          "required" : true,
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "partNumber",
-          "in" : "query",
-          "required" : true,
-          "schema" : {
-            "type" : "string"
-          }
-        } ],
+      "get" : {
+        "operationId" : "get_list",
         "requestBody" : {
           "content" : {
-            "multipart/form-data" : {
+            "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/Empty"
+                "$ref" : "#/components/schemas/UploadList"
               }
             }
           },
@@ -146,10 +125,9 @@
             }
           }
         },
-        "x-amazon-apigateway-request-validator" : "Validate body, query string parameters, and headers",
         "x-amazon-apigateway-integration" : {
           "httpMethod" : "POST",
-          "uri" : "arn:aws:apigateway:il-central-1:lambda:path/2015-03-31/functions/arn:aws:lambda:il-central-1:089286297150:function:fileMng/invocations",
+          "uri" : "arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${region}:${account}:function:${lambda_name}/invocations",
           "responses" : {
             "default" : {
               "statusCode" : "200"
@@ -209,110 +187,19 @@
         }
       }
     },
-    "/test" : {
-      "get" : {
-        "operationId" : "test",
-        "parameters" : [ {
-          "name" : "fileName",
-          "in" : "query",
-          "required" : true,
-          "schema" : {
-            "type" : "string"
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "200 response",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Empty"
-                }
-              }
-            }
-          }
-        },
-        "x-amazon-apigateway-request-validator" : "Validate query string parameters and headers",
-        "x-amazon-apigateway-integration" : {
-          "httpMethod" : "POST",
-          "uri" : "arn:aws:apigateway:il-central-1:lambda:path/2015-03-31/functions/arn:aws:lambda:il-central-1:089286297150:function:fileMng-init/invocations",
-          "responses" : {
-            "default" : {
-              "statusCode" : "200"
-            }
-          },
-          "passthroughBehavior" : "when_no_match",
-          "contentHandling" : "CONVERT_TO_TEXT",
-          "type" : "aws_proxy"
-        }
-      },
-      "options" : {
-        "responses" : {
-          "200" : {
-            "description" : "200 response",
-            "headers" : {
-              "Access-Control-Allow-Origin" : {
-                "schema" : {
-                  "type" : "string"
-                }
-              },
-              "Access-Control-Allow-Methods" : {
-                "schema" : {
-                  "type" : "string"
-                }
-              },
-              "Access-Control-Allow-Headers" : {
-                "schema" : {
-                  "type" : "string"
-                }
-              }
-            },
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Empty"
-                }
-              }
-            }
-          }
-        },
-        "x-amazon-apigateway-integration" : {
-          "responses" : {
-            "default" : {
-              "statusCode" : "200",
-              "responseParameters" : {
-                "method.response.header.Access-Control-Allow-Methods" : "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'",
-                "method.response.header.Access-Control-Allow-Headers" : "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
-                "method.response.header.Access-Control-Allow-Origin" : "'*'"
-              }
-            }
-          },
-          "requestTemplates" : {
-            "application/json" : "{\"statusCode\": 200}"
-          },
-          "passthroughBehavior" : "when_no_match",
-          "type" : "mock"
-        }
-      }
-    },
-    "/complete" : {
+    "/upload/complete" : {
       "post" : {
         "operationId" : "complete",
-        "parameters" : [ {
-          "name" : "fileName",
-          "in" : "query",
-          "required" : true,
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "uploadId",
-          "in" : "query",
-          "required" : true,
-          "schema" : {
-            "type" : "string"
-          }
-        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Upload"
+              }
+            }
+          },
+          "required" : true
+        },
         "responses" : {
           "200" : {
             "description" : "200 response",
@@ -325,10 +212,9 @@
             }
           }
         },
-        "x-amazon-apigateway-request-validator" : "Validate query string parameters and headers",
         "x-amazon-apigateway-integration" : {
           "httpMethod" : "POST",
-          "uri" : "arn:aws:apigateway:il-central-1:lambda:path/2015-03-31/functions/arn:aws:lambda:il-central-1:089286297150:function:fileMng-complete/invocations",
+          "uri" : "arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${region}:${account}:function:${lambda_name}/invocations",
           "responses" : {
             "default" : {
               "statusCode" : "200"
@@ -394,18 +280,67 @@
       "Empty" : {
         "title" : "Empty Schema",
         "type" : "object"
+      },
+      "User" : {
+        "title" : "User",
+        "required" : [ "UserId" ],
+        "type" : "object",
+        "properties" : {
+          "UserId" : {
+            "type" : "string",
+            "default" : ""
+          },
+          "PodcastId" : {
+            "type" : "string",
+            "default" : ""
+          },
+          "EpisodeId" : {
+            "type" : "string",
+            "default" : ""
+          }
+        }
+      },
+      "Upload" : {
+        "title" : "Upload",
+        "required" : [ "FileName", "User" ],
+        "type" : "object",
+        "properties" : {
+          "Created" : {
+            "type" : "string",
+            "default" : ""
+          },
+          "User" : {
+            "$ref" : "#/components/schemas/User"
+          },
+          "FileName" : {
+            "type" : "string",
+            "default" : ""
+          },
+          "UploadId" : {
+            "type" : "string",
+            "default" : ""
+          },
+          "Parts" : {
+            "type" : "number",
+            "default" : 0
+          },
+          "Size" : {
+            "type" : "number",
+            "default" : 0
+          },
+          "IsCompleted" : {
+            "type" : "boolean",
+            "default" : false
+          }
+        }
+      },
+      "UploadList" : {
+        "title" : "UploadList",
+        "type" : "array",
+        "items" : {
+          "$ref" : "#/components/schemas/Upload"
+        }
       }
     }
-  },
-  "x-amazon-apigateway-request-validators" : {
-    "Validate body, query string parameters, and headers" : {
-      "validateRequestParameters" : true,
-      "validateRequestBody" : true
-    },
-    "Validate query string parameters and headers" : {
-      "validateRequestParameters" : true,
-      "validateRequestBody" : false
-    }
-  },
-  "x-amazon-apigateway-binary-media-types" : [ "multipart/form-data" ]
+  }
 }
