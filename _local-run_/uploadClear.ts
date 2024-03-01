@@ -2,8 +2,8 @@ import * as AWS from "aws-sdk";
 import { UploaderConfig } from "../src/services/uploaderSettings";
 
 async function clearMultipartUploads() {
-	const bucket = UploaderConfig.Bucket;
-	const s3 = new AWS.S3({ region: UploaderConfig.BucketRegion });
+	const bucket = UploaderConfig.Bucket!;
+	const s3 = new AWS.S3({ region: process.env.REGION });
 
 	try {
 		const listResult = await s3.listMultipartUploads({ Bucket: bucket }).promise();
