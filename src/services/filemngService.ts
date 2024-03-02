@@ -28,10 +28,10 @@ export class FileMngService implements IFileMngService<Upload> {
 
 	async init(upload: Upload): Promise<Upload> {
 		console.log("Upload", upload);
-        
-        //TODO: check if it comes from create or update
+
+		//TODO: check if it comes from create or update
 		const ext = upload.FileName.split(".").pop()?.toLowerCase();
-		upload.FileName = this.getUID() + "." + ext;
+		upload.FileName = upload.User.EpisodeId + "." + ext;
 
 		const createResp = await this.s3.send(
 			new CreateMultipartUploadCommand({
@@ -115,6 +115,7 @@ export class FileMngService implements IFileMngService<Upload> {
 				new CompleteMultipartUploadCommand(completeMultipartUploadInput)
 			);
 			upload.IsCompleted = true;
+			upload.FileName = UploaderConfig.GetKey(upload.FileName, upload.User);
 			const response = await this.dbHelper.update<Upload>(upload._id, upload);
 
 			return upload;
