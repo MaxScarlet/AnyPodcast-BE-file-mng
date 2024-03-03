@@ -2,7 +2,7 @@ import { APIGatewayProxyEvent } from "aws-lambda";
 import { StatusCodes } from "http-status-codes";
 import { GenericApiController } from "./genericApiController";
 import { Upload } from "../models/Upload";
-import { IFileMngService } from "./completeController";
+import { IFileMngService } from "../services/filemngService";
 
 export class InitController extends GenericApiController {
 	constructor(private service: IFileMngService<any>) {

@@ -4,7 +4,7 @@ import { GenericApiController } from "./genericApiController";
 import { Upload } from "../models/Upload";
 import { IFileMngService } from "../services/filemngService";
 
-export class CompleteController extends GenericApiController {
+export class UploadController extends GenericApiController {
 	constructor(private service: IFileMngService<any>) {
 		super();
 	}
@@ -17,8 +17,7 @@ export class CompleteController extends GenericApiController {
 				case "POST":
 					if (body) {
 						const bodyParsed = JSON.parse(body!) as any;
-						const { Parts, ...upload } = bodyParsed;
-						const uploadResp = await this.service.complete(upload, Parts);
+						const uploadResp = await this.service.upload(bodyParsed);
 						return this.successResponse(uploadResp, StatusCodes.CREATED);
 					} else {
 						return this.errorResponse(StatusCodes.BAD_REQUEST);
