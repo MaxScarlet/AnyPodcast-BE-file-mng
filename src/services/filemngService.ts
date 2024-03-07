@@ -29,12 +29,12 @@ export class FileMngService implements IFileMngService<Upload> {
 		console.log("Upload", upload);
 
 		//TODO: check if it comes from create or update
-		this.fileNameChange(upload);
+		upload.FileName = UploaderConfig.GetKey(upload);
 
 		const createResp = await this.s3.send(
 			new CreateMultipartUploadCommand({
 				Bucket: UploaderConfig.Bucket,
-				Key: UploaderConfig.GetKey(upload.FileName, upload.User),
+				Key: upload.FileName,
 			})
 		);
 		upload.UploadId = createResp.UploadId!;
@@ -55,18 +55,13 @@ export class FileMngService implements IFileMngService<Upload> {
 		return upload;
 	}
 
-	private fileNameChange(upload: Upload) {
-		const ext = upload.FileName.split(".").pop()?.toLowerCase();
-		upload.FileName = upload.User.EpisodeId + "." + ext;
-	}
-
 	private async presignedURL(upload: Upload, partNumber: number) {
 		const expTime = process.env.ENV === "local" ? 60 : 3600; // URL expires in 1 hour
 		let command;
 		if (upload.UploadId) {
 			command = new UploadPartCommand({
 				Bucket: UploaderConfig.Bucket,
-				Key: UploaderConfig.GetKey(upload.FileName, upload.User),
+				Key: upload.FileName,
 				UploadId: upload.UploadId,
 				PartNumber: partNumber,
 			});
@@ -74,7 +69,7 @@ export class FileMngService implements IFileMngService<Upload> {
 			const ext = upload.FileName.split(".").pop()?.toLowerCase();
 			command = new PutObjectCommand({
 				Bucket: UploaderConfig.Bucket,
-				Key: UploaderConfig.GetKey(upload.FileName, upload.User),
+				Key: upload.FileName,
 				ContentType: `image/${ext}`,
 			});
 		}
@@ -84,14 +79,15 @@ export class FileMngService implements IFileMngService<Upload> {
 
 	//TODO: Fix different extensions with same ID, maybe delete old file before uploading new one?
 	async upload(upload: Upload): Promise<any> {
-		this.fileNameChange(upload);
+		upload.FileName = UploaderConfig.GetKey(upload);
+		console.log("upload 83", upload);
+
 		const presignedURL = await this.presignedURL(upload, 1);
 		upload.Parts = [];
 		upload.Parts.push({
 			PartNumber: 1,
 			PresignedUrl: presignedURL,
 		});
-		upload.FileName = UploaderConfig.GetKey(upload.FileName, upload.User);
 		return upload;
 	}
 
@@ -101,14 +97,14 @@ export class FileMngService implements IFileMngService<Upload> {
 		const uploadFound = await this.dbHelper.get_list<UploadDoc>({ UploadId: upload.UploadId });
 		console.log("uploadFound in DB", uploadFound);
 		if (uploadFound) {
-			const upload = uploadFound[0];
+			const uploadItem = uploadFound[0];
 			completedParts.sort((a, b) => a.PartNumber - b.PartNumber);
 			console.log("completedParts", completedParts);
 
 			const completeMultipartUploadInput: CompleteMultipartUploadCommandInput = {
 				Bucket: UploaderConfig.Bucket,
-				Key: UploaderConfig.GetKey(upload.FileName, upload.User),
-				UploadId: upload.UploadId,
+				Key: uploadItem.FileName,
+				UploadId: uploadItem.UploadId,
 				MultipartUpload: {
 					Parts: completedParts,
 				},
@@ -117,11 +113,11 @@ export class FileMngService implements IFileMngService<Upload> {
 			const resp = await this.s3.send(
 				new CompleteMultipartUploadCommand(completeMultipartUploadInput)
 			);
-			upload.IsCompleted = true;
-			upload.FileName = UploaderConfig.GetKey(upload.FileName, upload.User);
-			const response = await this.dbHelper.update<Upload>(upload._id, upload);
+			uploadItem.IsCompleted = true;
+			// uploadItem.FileName = UploaderConfig.GetKey(uploadItem);
+			await this.dbHelper.update<Upload>(uploadItem._id, uploadItem);
 
-			return upload;
+			return uploadItem;
 		} else {
 			throw new Error(`Upload ${upload.UploadId} not found`);
 		}

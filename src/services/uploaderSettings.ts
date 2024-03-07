@@ -1,3 +1,4 @@
+import { Upload } from "../models/Upload";
 import { User } from "../models/User";
 
 class UploaderSettings {
@@ -7,9 +8,17 @@ class UploaderSettings {
 	// public readonly UploadFolder = "upload";
 	public readonly BucketPath = process.env.BUCKET_PATH;
 
-	public GetKey(fileName: string, user: User) {
+	public GetKey(upload: Upload) {
 		// return `${this.UploadFolder}/${projectName}/${process.env.ENV ?? "local"}/${fileName}`;
-		return `${this.BucketPath}/${user.UserId}/${user.PodcastId}/${fileName}`;
+		const ext = upload.FileName.split(".").pop()?.toLowerCase();
+		const pathPref = `${this.BucketPath}/${upload.User.UserId}/`;
+		if (!upload.User.EpisodeId) {
+			upload.FileName = `${upload.User.PodcastId}.${ext}`;
+		} else {
+			upload.FileName = `${upload.User.PodcastId}/${upload.User.EpisodeId}.${ext}`;
+		}
+		upload.FileName = `${pathPref}${upload.FileName}`;
+		return upload.FileName;
 	}
 }
 
