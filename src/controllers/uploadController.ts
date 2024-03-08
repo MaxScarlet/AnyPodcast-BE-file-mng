@@ -22,6 +22,12 @@ export class UploadController extends GenericApiController {
 					} else {
 						return this.errorResponse(StatusCodes.BAD_REQUEST);
 					}
+				case "PATCH":
+					const deleteInstructions = JSON.parse(body!);
+					for (const deleteInstruction of deleteInstructions) {
+						await this.service.deleteFile(deleteInstruction);
+					}
+					return this.successResponse(StatusCodes.GONE);
 				default:
 					return this.errorResponse(StatusCodes.METHOD_NOT_ALLOWED);
 			}

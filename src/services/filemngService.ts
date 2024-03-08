@@ -7,6 +7,7 @@ import {
 	UploadPartCommand,
 	GetObjectCommand,
 	PutObjectCommand,
+	DeleteObjectCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { UploaderConfig } from "./uploaderSettings";
@@ -19,6 +20,7 @@ export interface IFileMngService<T> {
 	init(upload: Upload): Promise<Upload>;
 	complete(upload: Upload, completedParts: any): Promise<any>;
 	upload(upload: Upload): Promise<Upload>;
+	deleteFile(file: any): Promise<void>;
 }
 
 export class FileMngService implements IFileMngService<Upload> {
@@ -28,7 +30,6 @@ export class FileMngService implements IFileMngService<Upload> {
 	async init(upload: Upload): Promise<Upload> {
 		console.log("Upload", upload);
 
-		//TODO: check if it comes from create or update
 		upload.FileName = UploaderConfig.GetKey(upload);
 
 		const createResp = await this.s3.send(
@@ -89,6 +90,15 @@ export class FileMngService implements IFileMngService<Upload> {
 			PresignedUrl: presignedURL,
 		});
 		return upload;
+	}
+
+	async deleteFile(file: any): Promise<void> {
+		const deleteResp = await this.s3.send(
+			new DeleteObjectCommand({
+				Bucket: UploaderConfig.Bucket,
+				Key: file.fileName,
+			})
+		);
 	}
 
 	async complete(upload: Upload, completedParts: Part[]): Promise<any> {
