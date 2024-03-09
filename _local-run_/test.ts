@@ -1,4 +1,3 @@
-import { APIGatewayProxyEvent } from "aws-lambda";
 import merge from "deepmerge";
 import { handler } from "../src/index";
 
@@ -7,6 +6,7 @@ let apiRequest;
 
 //GET apiRequest
 import * as apiRequestGetList from "./data/API_Event_GET.json";
+import { APIGatewayProxyEvent } from "../src/controllers/genericApiController";
 // import * as apiRequestGetList from "./test.json";
 
 //POST apiRequest

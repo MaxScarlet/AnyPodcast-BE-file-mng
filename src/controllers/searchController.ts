@@ -1,4 +1,4 @@
-import { APIGatewayProxyEvent } from "aws-lambda";
+import { APIGatewayProxyEvent } from "./genericApiController";
 import { StatusCodes } from "http-status-codes";
 import { GenericApiController } from "./genericApiController";
 import { SearchParams } from "../models/SearchParams";

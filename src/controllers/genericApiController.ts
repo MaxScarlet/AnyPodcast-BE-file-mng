@@ -1,8 +1,68 @@
-import { APIGatewayProxyEvent } from "aws-lambda";
 import { StatusCodes } from "http-status-codes";
 
+export interface APIGatewayProxyEvent {
+	httpMethod: string;
+	body: string;
+	headers: { [name: string]: string };
+	multiValueHeaders: { [name: string]: string[] };
+	isBase64Encoded: boolean;
+	path: string;
+	pathParameters: { [name: string]: string };
+	queryStringParameters: { [name: string]: string };
+	multiValueQueryStringParameters: { [name: string]: string[] };
+	stageVariables: { [name: string]: string };
+	resource: string;
+	requestContext: {
+		accountId: string;
+		apiId: string;
+		authorizer: { [name: string]: any }; // Adjust according to the authorizer's structure
+		protocol: string;
+		httpMethod: string;
+		identity: {
+			accessKey: string;
+			sourceIp: string;
+			accountId: string | null;
+			apiKeyId: string | null;
+			apiKey: string | null;
+			caller: string | null;
+			clientCert: any | null; // Adjust according to the client certificate's structure
+			cognitoAuthenticationProvider: string | null;
+			cognitoAuthenticationType: string | null;
+			cognitoIdentityId: string | null;
+			principalOrgId: string | null;
+			cognitoIdentityPoolId: string | null;
+			user: string | null;
+			userAgent: string | null;
+			userArn: string | null;
+		};
+		path: string;
+		requestTimeEpoch: number;
+		requestId: string;
+		resourceId: string;
+		resourcePath: string;
+		stage: string;
+	};
+}
+
+interface APIGatewayProxyResult {
+	statusCode: number;
+	headers?: { [header: string]: string | boolean };
+	body: string;
+	isBase64Encoded?: boolean;
+}
+
+export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
+	// Your code here
+	return {
+		statusCode: 200,
+		body: JSON.stringify({ message: 'Hello from Lambda!' })
+	};
+}
+
+
+
 export class GenericApiController {
-	constructor() {}
+	constructor() { }
 
 	async handleRequest(event: APIGatewayProxyEvent): Promise<any> {
 		try {

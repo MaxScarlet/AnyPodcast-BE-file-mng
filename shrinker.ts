@@ -2,19 +2,14 @@ import fse from "fs-extra";
 import path from "path";
 import packs from "./package-lock.json";
 
-import { Command } from "commander";
-const program = new Command();
-program
-	.option("-v, --verbose", "Enable verbose logs")
-	.option("-e, --externalize", "Process for package externalization");
-program.parse(process.argv);
-const options = program.opts();
-
 // Shrinker core
 import * as fs from "fs";
 
 const activePath: string[] = [];
 let distPath: string = "dist";
+const args = process.argv.slice(2);
+const isVerbose = args.includes('-v');
+const isExternalize = args.includes('-e');
 
 const getModulePath = (realPath: string): string =>
 	realPath.slice(realPath.lastIndexOf(`${path.sep}node_modules`));
@@ -101,12 +96,12 @@ const changeRef = (request: string, realPath: string): void => {
 
 const isPackInArray = (arr: string[], packName: string) => {
 	return arr.some(nameDef => {
-        if (nameDef.endsWith('/*')) { // If the pattern ends with '/*', we remove this part and check if the packName starts with the remaining string
-            return packName.startsWith(nameDef.slice(0, -2));
-        } else { // Exact match
-            return packName === nameDef;
-        }
-    });
+		if (nameDef.endsWith('/*')) { // If the pattern ends with '/*', we remove this part and check if the packName starts with the remaining string
+			return packName.startsWith(nameDef.slice(0, -2));
+		} else { // Exact match
+			return packName === nameDef;
+		}
+	});
 }
 
 const results: {
@@ -126,14 +121,14 @@ let asIs: string[] = [
 	"@smithy/*",
 	"@aws-crypto/*",
 	"@aws-sdk/*"
-]; // , '@tootallnate/once', 'i18n', 'messageformat', 'agent-base', 'tsutils', "superagent", 'argparse'
+]; // , '@tootallnate/once', 'i18n', 'messageformat', 'agent-base', "superagent"
 
 const extractFromDist: string[] = [];
 
 // If we need to externalize the project to test the compiled package locally,
 // we can't ignore packs of AWS Lambda container.
 // We should include them as-is.
-if (options.externalize) {
+if (isExternalize) {
 	asIs = [...asIs, ...ignore];
 	ignore = [];
 }
@@ -163,28 +158,28 @@ packKeys.forEach((packNameFull: string) => {
 		const packName = packNameFull.replace("node_modules/", "");
 		let pathTo;
 		if (d.dev) {
-			if (options.verbose) console.log(`${packName} ...dev package, skipped.`);
+			if (isVerbose) console.log(`${packName} ...dev package, skipped.`);
 			results.skipped++;
 		} else if (isPackInArray(ignore, packName)) {
-			if (options.verbose) console.log(`${packName} ...ignored, skipped.`);
+			if (isVerbose) console.log(`${packName} ...ignored, skipped.`);
 			results.ignored++;
-		// } else if (asIs.includes(packName)) {
+			// } else if (asIs.includes(packName)) {
 		} else if (isPackInArray(asIs, packName)) {
 			const pathFrom = path.join(initialFolder, packName);
 			pathTo = path.join(distrFolder, "node_modules", packName);
 			fse.copySync(pathFrom, pathTo, { overwrite: true });
-			if (options.verbose) console.log(`${packName} ...copied as-is.`);
+			if (isVerbose) console.log(`${packName} ...copied as-is.`);
 			results.copied++;
 		} else {
-			if (options.verbose) console.log(`${packName} ...shrinking...`);
+			if (isVerbose) console.log(`${packName} ...shrinking...`);
 			entry(packName);
-			if (options.verbose) console.log(`${packName} ...shrinked.`);
+			if (isVerbose) console.log(`${packName} ...shrinked.`);
 			results.shrinked++;
 		}
 
 		if (extractFromDist.includes(packName)) {
 			fse.move(`${pathTo}\\dist\\index.js`, `${pathTo}\\index.js`);
-			if (options.verbose) console.log(`${packName}... extracted from dist`);
+			if (isVerbose) console.log(`${packName}... extracted from dist`);
 		}
 	}
 });

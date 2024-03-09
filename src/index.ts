@@ -1,4 +1,4 @@
-import { APIGatewayProxyEvent } from "aws-lambda";
+import { APIGatewayProxyEvent } from "../src/controllers/genericApiController";
 import MongoDbHelper from "./helpers/mongoHelper";
 import { GenericApiController } from "./controllers/genericApiController";
 
