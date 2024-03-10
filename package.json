@@ -14,7 +14,6 @@
 		"shrink_verb": "ts-node shrinker.ts -v",
 		"shrink_": "rm -rf dist_layer && ts-node shrinker.ts && mv dist dist_layer && cd ./dist_layer && mkdir -p nodejs && mv node_modules nodejs",
 		"shrink": "rm -rf dist_layer && ts-node shrinker.ts && ./shrinker_ren.sh",
-		"shrink_modules": "ts-node modulesPack.ts && ./shrinker_ren.sh",
 		"shrink_rm": "rm -rf dist",
 		"//----dist----": "::: Scripts for create distributive ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::",
 		"dist": "npm run compile && npm run shrink",

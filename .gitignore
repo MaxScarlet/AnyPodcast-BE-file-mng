@@ -7,10 +7,9 @@ export
 generated
 node_modules
 mock
-.DS_Store
+
+/swagger/oas30.json
 
 __tests__/**/coverage
 **/jest-report*.xml
 /junit.xml
-
-
