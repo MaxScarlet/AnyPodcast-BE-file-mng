@@ -8,7 +8,6 @@ async function clearMultipartUploads() {
 	try {
 		const listResult = await s3.listMultipartUploads({ Bucket: bucket }).promise();
 
-		// Iterate through the results
 		for (const upload of listResult.Uploads || []) {
 			const key = upload.Key;
 			const uploadId = upload.UploadId;

@@ -53,26 +53,11 @@ export default class MongoDbHelper<T extends Document> implements IDbHelper<T> {
   }
 
   async search<T>(args: any): Promise<T[]> {
-    // console.log("Search args", args);
 
     let lst;
     let arrgParams = MongoDbHelper.convertToAggregation(args);
 
     console.log("Aggr params", arrgParams);
-    // arrgParams = [
-    //   {
-    //     $group: {
-    //       _id: { DealerName: '$DealerName', CasinoName: '$CasinoName' },
-    //     },
-    //   },
-    //   {
-    //     $project: {
-    //       _id: 0,
-    //       DealerName: '$_id.DealerName',
-    //       CasinoName: '$_id.CasinoName',
-    //     },
-    //   },
-    // ]
     lst = await this.model.aggregate(arrgParams);
 
     return <T[]>lst;
@@ -80,43 +65,25 @@ export default class MongoDbHelper<T extends Document> implements IDbHelper<T> {
 
   private static convertToAggregation(searchParams?: any) {
     let aggregationPipeline: any[] = [];
-    // aggregationPipeline.push({
-    //   $addFields: {
-    //     CreatedDate: {
-    //       $dateFromString: {
-    //         dateString: '$Created', // Assuming 'Created' is your timestamp string field
-    //       },
-    //     },
-    //   },
-    // } as any);
-    // aggregationPipeline.push({ $sort: { Created: -1 } } as any);
     if (searchParams) {
-      // If searchParams provided, build a dynamic aggregation pipeline
       const matchStage = {};
       const groupStage = {};
 
-      // Iterate through the keys of the searchParams object
       for (const key of Object.keys(searchParams)) {
         if (searchParams[key]) {
-          // If the value of the field is not empty, add a $match stage for that field
           matchStage[key] = searchParams[key];
         }
-        // Add a $group stage for all other fields
         groupStage[key] = `$$ROOT.${key}`;
       }
-      // console.log("matchStage", matchStage);
       if (Object.keys(matchStage).length > 0) {
-        // If matchStage is not empty, add it to the aggregation pipeline
         aggregationPipeline.push({ $match: matchStage });
       }
       console.log("groupStage", groupStage);
-      // Add a $group stage to group by the fields specified in groupStage
       aggregationPipeline.push({ $group: { _id: 
         groupStage,
         maxCreated: { $max: { $dateFromString: { dateString: '$Created' } } },
        } } );
       aggregationPipeline.push({ $sort: { maxCreated: -1 } } as any);
-      // Add a $project stage to reshape the output
       const projectStage = { _id: 0 };
       for (const key of Object.keys(groupStage)) {
         projectStage[key] = `$_id.${key}`;
@@ -128,11 +95,9 @@ export default class MongoDbHelper<T extends Document> implements IDbHelper<T> {
 
   public static generateSchemaFromInterface = (interfaceObj: any): Schema => {
     const schemaFields: SchemaDefinition = {};
-    // const fieldNames = Reflect.ownKeys(interfaceObj.prototype);
     for (const key in interfaceObj) {
       const fieldType = typeof interfaceObj[key];
 
-      // Map the field types to Mongoose schema types
       switch (fieldType) {
         case "number":
           schemaFields[key] = { type: Number };

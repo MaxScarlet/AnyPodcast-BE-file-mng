@@ -15,7 +15,7 @@ export interface APIGatewayProxyEvent {
 	requestContext: {
 		accountId: string;
 		apiId: string;
-		authorizer: { [name: string]: any }; // Adjust according to the authorizer's structure
+		authorizer: { [name: string]: any }; 
 		protocol: string;
 		httpMethod: string;
 		identity: {
@@ -25,7 +25,7 @@ export interface APIGatewayProxyEvent {
 			apiKeyId: string | null;
 			apiKey: string | null;
 			caller: string | null;
-			clientCert: any | null; // Adjust according to the client certificate's structure
+			clientCert: any | null; 
 			cognitoAuthenticationProvider: string | null;
 			cognitoAuthenticationType: string | null;
 			cognitoIdentityId: string | null;
@@ -52,7 +52,6 @@ interface APIGatewayProxyResult {
 }
 
 export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
-	// Your code here
 	return {
 		statusCode: 200,
 		body: JSON.stringify({ message: 'Hello from Lambda!' })
@@ -68,7 +67,6 @@ export class GenericApiController {
 		try {
 			const { httpMethod, path, body } = event;
 
-			//   switch (httpMethod) {}
 		} catch (error) {
 			console.error("Error:", error);
 			return this.errorResponse(StatusCodes.INTERNAL_SERVER_ERROR);
@@ -81,15 +79,6 @@ export class GenericApiController {
 		"Access-Control-Allow-Headers": "*",
 	};
 
-	// protected handleresponse(resp?: HttpResponse, err?: HttpError) {
-	//     if (!resp) {
-	//         return this.errorResponse(StatusCodes.IM_A_TEAPOT, 'Response is empty'); // UNPROCESSABLE_ENTITY
-	//     }
-	//     if (err) {
-	//         return this.errorResponse(err.statusCode, err.message);
-	//     }
-	//     return this.successResponse(resp.statusCode!, resp?.resp);
-	// }
 	protected successResponse(data: any, statusCode?: StatusCodes) {
 		console.log("successResponse", data);
 		return {

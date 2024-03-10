@@ -40,7 +40,6 @@ export class FileMngService implements IFileMngService<Upload> {
 		);
 		upload.UploadId = createResp.UploadId!;
 
-		// Assuming totalParts is passed in with the upload or calculated based on file size
 		const totalParts = upload.TotalParts ?? 0;
 		for (let partNumber = 1; partNumber <= totalParts; partNumber++) {
 			const url = await this.presignedURL(upload, partNumber);
@@ -48,7 +47,6 @@ export class FileMngService implements IFileMngService<Upload> {
 		}
 		console.log("Parts", upload.Parts);
 
-		// Create record in DB with pre-signed URLs
 		upload.Created = new Date().toISOString();
 		upload.IsCompleted = false;
 		await this.dbHelper.create<Upload>(upload);
@@ -124,7 +122,6 @@ export class FileMngService implements IFileMngService<Upload> {
 				new CompleteMultipartUploadCommand(completeMultipartUploadInput)
 			);
 			uploadItem.IsCompleted = true;
-			// uploadItem.FileName = UploaderConfig.GetKey(uploadItem);
 			await this.dbHelper.update<Upload>(uploadItem._id, uploadItem);
 
 			return uploadItem;
@@ -151,27 +148,3 @@ export class FileMngService implements IFileMngService<Upload> {
 		}
 	}
 }
-
-// async uploadPart(part: Part, body: string): Promise<Part> {
-// 	const uploadFound = await this.dbHelper.get_list<Upload>({ UploadId: part.UploadId });
-// 	console.log("uploadFound in DB", uploadFound);
-// 	if (uploadFound) {
-// 		const upload = uploadFound[0];
-// 		const filePart = Buffer.from(body, "base64");
-
-// 		const uploadPartResponse = await this.s3.send(
-// 			new UploadPartCommand({
-// 				Bucket: UploaderConfig.Bucket,
-// 				Key: UploaderConfig.GetKey(upload.FileName),
-// 				PartNumber: part.PartNumber,
-// 				UploadId: part.UploadId,
-// 				Body: filePart,
-// 			})
-// 		);
-// 		part.ETag = uploadPartResponse.ETag;
-// 		const { UploadId, ...partOut } = part;
-// 		return partOut;
-// 	} else {
-// 		throw new Error(`Upload ${part.UploadId} not found`);
-// 	}
-// }
