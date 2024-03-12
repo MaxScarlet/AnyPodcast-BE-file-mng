@@ -20,6 +20,7 @@ export interface IFileMngService<T> {
 	init(upload: Upload): Promise<Upload>;
 	complete(upload: Upload, completedParts: any): Promise<any>;
 	upload(upload: Upload): Promise<Upload>;
+	config();
 	deleteFile(file: any): Promise<void>;
 }
 
@@ -76,7 +77,6 @@ export class FileMngService implements IFileMngService<Upload> {
 		return url;
 	}
 
-	//TODO: Fix different extensions with same ID, maybe delete old file before uploading new one?
 	async upload(upload: Upload): Promise<any> {
 		upload.FileName = UploaderConfig.GetKey(upload);
 		console.log("upload 83", upload);
@@ -90,6 +90,15 @@ export class FileMngService implements IFileMngService<Upload> {
 		return upload;
 	}
 
+	config() {
+		return {
+			URLPrefix: `https://s3.${process.env.REGION}.amazonaws.com/${UploaderConfig.Bucket}/`,
+			Bucket: UploaderConfig.Bucket,
+			BucketPath: UploaderConfig.BucketPath,
+			DefaultPosterName: "DefaultPoster.PNG",
+		};
+	}
+    
 	async deleteFile(file: any): Promise<void> {
 		const deleteResp = await this.s3.send(
 			new DeleteObjectCommand({

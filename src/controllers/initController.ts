@@ -25,7 +25,9 @@ export class InitController extends GenericApiController {
 					} else {
 						return this.errorResponse(StatusCodes.BAD_REQUEST);
 					}
-
+				case "GET":
+                    const resp : Upload = await this.service.config()
+                    return this.successResponse(resp);
 				default:
 					return this.errorResponse(StatusCodes.METHOD_NOT_ALLOWED);
 			}

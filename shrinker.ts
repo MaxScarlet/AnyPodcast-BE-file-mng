@@ -92,9 +92,9 @@ const changeRef = (request: string, realPath: string): void => {
 
 const isPackInArray = (arr: string[], packName: string) => {
 	return arr.some(nameDef => {
-		if (nameDef.endsWith('/*')) { // If the pattern ends with '/*', we remove this part and check if the packName starts with the remaining string
+		if (nameDef.endsWith('/*')) { 
 			return packName.startsWith(nameDef.slice(0, -2));
-		} else { // Exact match
+		} else { 
 			return packName === nameDef;
 		}
 	});
