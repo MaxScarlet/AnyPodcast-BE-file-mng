@@ -9,6 +9,7 @@ node_modules
 mock
 
 /swagger/oas30.json
+.env*
 
 __tests__/**/coverage
 **/jest-report*.xml

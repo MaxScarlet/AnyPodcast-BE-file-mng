@@ -131,8 +131,8 @@ export default class MongoDbHelper<T extends Document> implements IDbHelper<T> {
 
 class MongoConfig {
 	constructor(private clusterName: string) {}
-	public user = "dbOwner"; //Change to your user
-	public pass = process.env.MONGO_PASS;
+	public user = process.env.DB_USER;
+	public pass = process.env.DB_PASS;
 	public dbName = process.env.DB_NAME;
 
 	public get connectionString(): string {

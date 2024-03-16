@@ -95,7 +95,7 @@ export class FileMngService implements IFileMngService<Upload> {
 			URLPrefix: `https://s3.${process.env.REGION}.amazonaws.com/${UploaderConfig.Bucket}/`,
 			Bucket: UploaderConfig.Bucket,
 			BucketPath: UploaderConfig.BucketPath,
-			DefaultPosterName: "DefaultPoster.PNG",
+			DefaultPosterName: "DefaultPoster.png",
 		};
 	}
     
