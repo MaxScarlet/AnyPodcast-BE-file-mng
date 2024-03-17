@@ -72,6 +72,7 @@ export class FileMngService implements IFileMngService<Upload> {
 				Key: upload.FileName,
 				ContentType: `image/${ext}`,
 			});
+            console.log(command);
 		}
 		const url = await getSignedUrl(this.s3, command, { expiresIn: expTime });
 		return url;
