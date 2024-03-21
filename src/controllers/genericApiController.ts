@@ -15,7 +15,7 @@ export interface APIGatewayProxyEvent {
 	requestContext: {
 		accountId: string;
 		apiId: string;
-		authorizer: { [name: string]: any }; 
+		authorizer: { [name: string]: any };
 		protocol: string;
 		httpMethod: string;
 		identity: {
@@ -25,7 +25,7 @@ export interface APIGatewayProxyEvent {
 			apiKeyId: string | null;
 			apiKey: string | null;
 			caller: string | null;
-			clientCert: any | null; 
+			clientCert: any | null;
 			cognitoAuthenticationProvider: string | null;
 			cognitoAuthenticationType: string | null;
 			cognitoIdentityId: string | null;
@@ -57,8 +57,6 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 		body: JSON.stringify({ message: 'Hello from Lambda!' })
 	};
 }
-
-
 
 export class GenericApiController {
 	constructor() { }

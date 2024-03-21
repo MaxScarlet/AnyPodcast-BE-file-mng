@@ -5,6 +5,7 @@
 	"version": "0.0.3",
 	"main_entity": "Upload",
 	"main": "index.js",
+  "license": "ISC",
 	"templ_api": "o9qfvgrga3",
 	"scripts": {
 		"compile_dev": "rm -rf dist_func/* && tsc",
