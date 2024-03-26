@@ -12,6 +12,7 @@ export interface IUpload {
 	Size?: number;
 	Parts: Part[];
 	IsCompleted?: boolean;
+	ContentType?: string;
 }
 export class Upload implements IUpload {
 	Created?: string = "";
@@ -22,6 +23,7 @@ export class Upload implements IUpload {
 	Size?: number = 0;
 	Parts: Part[];
 	IsCompleted?: boolean = false;
+	ContentType?: string = "";
 
 	constructor(data?: Upload | string) {
 		this.Parts = [];

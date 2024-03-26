@@ -8,6 +8,7 @@ import {
 	GetObjectCommand,
 	PutObjectCommand,
 	DeleteObjectCommand,
+	CreateMultipartUploadCommandInput,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { UploaderConfig } from "./uploaderSettings";
@@ -33,12 +34,16 @@ export class FileMngService implements IFileMngService<Upload> {
 
 		upload.FileName = UploaderConfig.GetKey(upload);
 
-		const createResp = await this.s3.send(
-			new CreateMultipartUploadCommand({
-				Bucket: UploaderConfig.Bucket,
-				Key: upload.FileName,
-			})
-		);
+		const uploadParams: CreateMultipartUploadCommandInput = {
+			Bucket: UploaderConfig.Bucket,
+			Key: upload.FileName,
+		};
+
+		if (upload.ContentType) {
+			uploadParams.ContentType = upload.ContentType;
+		}
+        
+		const createResp = await this.s3.send(new CreateMultipartUploadCommand(uploadParams));
 		upload.UploadId = createResp.UploadId!;
 
 		const totalParts = upload.TotalParts ?? 0;
@@ -72,7 +77,7 @@ export class FileMngService implements IFileMngService<Upload> {
 				Key: upload.FileName,
 				ContentType: `image/${ext}`,
 			});
-            console.log(command);
+			console.log(command);
 		}
 		const url = await getSignedUrl(this.s3, command, { expiresIn: expTime });
 		return url;
@@ -99,7 +104,7 @@ export class FileMngService implements IFileMngService<Upload> {
 			DefaultPosterName: "DefaultPoster.png",
 		};
 	}
-    
+
 	async deleteFile(file: any): Promise<void> {
 		const deleteResp = await this.s3.send(
 			new DeleteObjectCommand({
